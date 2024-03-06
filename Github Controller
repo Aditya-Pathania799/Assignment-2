@@ -1,0 +1,35 @@
+using Microsoft.AspNetCore.Mvc;
+using Octokit;
+using System.Threading.Tasks;
+
+namespace GitHubWebApp.Controllers
+{
+    public class GitHubController : Controller
+    {
+        private readonly GitHubClient _gitHubClient;
+
+        public GitHubController()
+        {
+            // Initialize GitHubClient with your GitHub credentials or OAuth token
+            _gitHubClient = new GitHubClient(new ProductHeaderValue("YourAppName"));
+        }
+
+        public async Task<IActionResult> Index(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return View("Error");
+            }
+
+            try
+            {
+                var user = await _gitHubClient.User.Get(username);
+                return View(user);
+            }
+            catch (NotFoundException)
+            {
+                return View("UserNotFound", username);
+            }
+        }
+    }
+}
